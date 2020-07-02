@@ -18,7 +18,7 @@ if DISCORD_TOKEN is None:
 bot = Bot(command_prefix='!')
 
 
-@bot.command(name='hi', help='Responds with a random quote from Brooklyn 99')
+@bot.command(name='hi', help='Responds with Greeting')
 async def greet(ctx):
     await ctx.send(f"Hey {ctx.message.author.display_name}")
 
@@ -40,10 +40,28 @@ async def googlesearch(ctx, *terms):
         db_instance.store(**search_request_data)
         search_results = fetch_search_results(search_term)
         if search_results.get('success', False):
-            response_links = '\n'.join([link for link in search_results.get('results', [])])
+            response_links = '\n'.join([_ for _ in search_results.get('results', [])])
             await ctx.send(f"Top Results from Google for '{search_term}' are:\n{response_links}")
         else:
             await ctx.send(f"Error while fetching search results from Google for {search_term}")
+
+
+@bot.command(name='recent', help='Returns recent search terms matching the provided term')
+async def recents(ctx, term=None):
+    if term is None:
+        await ctx.send("Usage: !recent <term>")
+    else:
+        db_instance = DB()
+        guild_id = ctx.guild.id
+        search_result = db_instance.search_term(term=term, guild_id=guild_id)
+        if search_result.get('success', False):
+            if search_result.get('results', []):
+                results = '\n'.join([result.get('term', '') for result in search_result.get('results', [])])
+                await ctx.send(f"Recent Similar searches to '{term}' are:\n{results}")
+            else:
+                await ctx.send(f"No recent searches match the provided term {term}")
+        else:
+            await ctx.send(f"Error while fetching querying search history for {term}")
 
 
 bot.run(DISCORD_TOKEN)
