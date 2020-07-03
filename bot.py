@@ -102,7 +102,7 @@ async def recents(ctx, term=None):
                 await ctx.send(f"No recent searches match the provided term {term}")
         else:
             ### Return response in case of failure in searching
-            await ctx.send(f"Error while fetching querying search history for {term}")
+            await ctx.send(f"Error while querying search history for {term}")
 
 
 bot.run(DISCORD_TOKEN)
